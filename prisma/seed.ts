@@ -99,23 +99,25 @@ async function seedDatabase() {
       },
     ];
 
-    // Criar 10 barbearias com nomes e endereços fictícios
     const barbershops = [];
+
     for (let i = 0; i < 10; i++) {
       const name = creativeNames[i];
       const address = addresses[i];
       const imageUrl = images[i];
-
+    
       const barbershop = await prisma.barbershop.create({
         data: {
           name,
           address,
-          imageUrl: imageUrl,
+          imageUrl,
         },
       });
-
+    
+      console.log(`Barbearia criada: ${barbershop.name} - ${barbershop.address}`);
+    
       for (const service of services) {
-        await prisma.service.create({
+        const createdService = await prisma.service.create({
           data: {
             name: service.name,
             description: service.description,
@@ -125,12 +127,18 @@ async function seedDatabase() {
                 id: barbershop.id,
               },
             },
+            imageUrl: "https://utfs.io/f/0ddfbd26-a424-43a0-aaf3-c3f1dc6be6d1-1kgxo7.png",
           },
         });
+    
+        console.log(`Serviço criado para ${barbershop.name}: ${createdService.name}`);
       }
-
+    
       barbershops.push(barbershop);
     }
+    
+    console.log('Todas as barbearias foram criadas:', barbershops);
+    
 
     // Fechar a conexão com o banco de dados
     await prisma.$disconnect();
